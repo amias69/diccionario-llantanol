@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- Hace que en el celular la página use el ancho real de la pantalla
+       en lugar de mostrarse como una página de escritorio reducida. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Traductor entre español y llantañol: palabras y sílabas convertidas en emojis.">
+  <title>Llantañol</title>
+  <link rel="stylesheet" href="estilos/estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <h1>Traductor de Llantañol</h1>
+    <p>Traduce del Llantañol al castellano y viceversa, hecho para uso exclusivo de los fracasados de la Beba Army..</p>
+  </header>
+
+  <main class="traductor">
+    <!-- Barra de idiomas: origen ⇄ destino -->
+    <div class="barra-idiomas">
+      <span id="idioma-origen" class="idioma">Español</span>
+      <button id="intercambiar" class="boton-icono" type="button"
+              aria-label="Intercambiar idiomas" title="Intercambiar idiomas">⇄</button>
+      <span id="idioma-destino" class="idioma">Llantañol</span>
+    </div>
+
+    <!-- Los dos paneles. En pantallas anchas van lado a lado;
+         en el celular, uno encima del otro (ver estilos.css). -->
+    <div class="paneles">
+      <section class="panel">
+        <label for="entrada" class="solo-lectores">Texto a traducir</label>
+        <textarea id="entrada" placeholder="Escribe aquí…" autofocus></textarea>
+        <div class="panel-pie">
+          <span id="contador" class="contador">0 caracteres</span>
+          <div class="acciones">
+            <!-- Muestra u oculta el selector. Solo aparece al escribir en
+                 llantañol (ver app.js). aria-expanded indica si está abierto. -->
+            <button id="mostrar-selector" class="boton" type="button"
+                    aria-controls="selector" aria-expanded="false" hidden>😀 Emojis</button>
+            <button id="limpiar" class="boton" type="button">Borrar</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-salida">
+        <!-- aria-live hace que los lectores de pantalla lean el resultado
+             cuando cambia. -->
+        <div id="salida" class="salida" aria-live="polite" aria-label="Traducción"></div>
+        <div class="panel-pie">
+          <span id="aviso" class="aviso" role="status"></span>
+          <button id="copiar" class="boton" type="button">Copiar</button>
+        </div>
+      </section>
+
+      <!-- Selector de emojis. Lo rellena selector-emojis.js.
+           Está dentro de .paneles para que el CSS pueda colocarlo justo bajo
+           el campo de entrada en el celular, y a lo ancho en computadora. -->
+      <section id="selector" class="selector" aria-label="Selector de emojis" hidden></section>
+    </div>
+  </main>
+
+  <!-- Crédito obligatorio: las imágenes de Twemoji tienen licencia CC-BY 4.0,
+       que permite usarlas libremente siempre que se cite a sus autores. -->
+  <footer class="pie">
+    Emojis de <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a>,
+    © Twitter, Inc. y colaboradores, con licencia
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC-BY 4.0</a>.
+  </footer>
+
+  <noscript>Esta aplicación necesita JavaScript para funcionar.</noscript>
+
+  <!-- type="module" permite usar import/export entre archivos.
+       Por eso la app debe abrirse desde un servidor (Live Server) y no con
+       doble clic en el archivo. -->
+  <script type="module" src="src/interfaz/app.js"></script>
+</body>
+</html>

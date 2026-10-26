@@ -1,0 +1,14 @@
+{
+  "name": "diccionario-llantanol",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "imagenes": "node herramientas/importar-twemoji.js",
+    "completar": "node herramientas/completar-diccionario.js"
+  },
+  "devDependencies": {
+    "@twemoji/svg": "^15.0.0",
+    "emojibase-data": "^15.3.2"
+  }
+}

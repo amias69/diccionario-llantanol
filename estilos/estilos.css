@@ -1,0 +1,425 @@
+/* =============================================================================
+   estilos.css — Diseño de la app
+   -----------------------------------------------------------------------------
+   Pensado primero para celular ("mobile first"): los estilos base son para
+   pantallas estrechas y la regla @media del final los adapta a pantallas
+   anchas.
+   ========================================================================== */
+
+/* --- Colores --------------------------------------------------------------
+   Se definen una vez como variables y se reutilizan en todo el archivo.
+   Si el sistema del usuario está en modo oscuro, se cambian solas.          */
+:root {
+  --fondo: #f6f7f9;
+  --superficie: #ffffff;
+  --borde: #dde1e6;
+  --texto: #1d2329;
+  --texto-suave: #5f6b77;
+  --acento: #1a73e8;
+  --acento-suave: #e8f0fe;
+  --error: #c5221f;
+  --radio: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #15181c;
+    --superficie: #1e2227;
+    --borde: #333a42;
+    --texto: #e6e9ec;
+    --texto-suave: #9aa5b1;
+    --acento: #8ab4f8;
+    --acento-suave: #26334a;
+    --error: #f28b82;
+  }
+}
+
+/* --- Base ---------------------------------------------------------------- */
+* {
+  box-sizing: border-box; /* el ancho incluye el relleno y el borde */
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+/* El atributo hidden debe ganar siempre, aunque otra regla le dé display
+   (por ejemplo, .selector usa display: grid). */
+[hidden] {
+  display: none !important;
+}
+
+/* Oculta un elemento a la vista pero lo deja para lectores de pantalla. */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Cabecera ------------------------------------------------------------ */
+.cabecera {
+  padding: 24px 16px 8px;
+  text-align: center;
+}
+
+.cabecera h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.cabecera p {
+  margin: 4px 0 0;
+  color: var(--texto-suave);
+}
+
+/* --- Contenedor del traductor -------------------------------------------- */
+.traductor {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.barra-idiomas {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* idioma | botón | idioma */
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.idioma {
+  padding: 8px 12px;
+  border-radius: var(--radio);
+  background: var(--acento-suave);
+  color: var(--acento);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- Paneles ------------------------------------------------------------- */
+.paneles {
+  display: grid;
+  grid-template-columns: 1fr; /* celular: una columna */
+  gap: 12px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.panel-salida {
+  order: 3;
+  background: var(--fondo);
+}
+
+#entrada,
+.salida {
+  flex: 1;
+  width: 100%;
+  min-height: 160px;
+  padding: 16px;
+  font: inherit;
+  font-size: 1.375rem;
+  color: var(--texto);
+}
+
+#entrada {
+  border: 0;
+  background: transparent;
+  resize: none;
+  outline: none;
+}
+
+.salida {
+  /* Respeta los saltos de línea y parte palabras muy largas. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Imagen de un emoji dibujada por la app (ver dibujar-emojis.js).
+   Mide lo mismo que una letra y se alinea con el texto. */
+.emoji {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: -0.2em;
+}
+
+.panel-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--borde);
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.contador,
+.aviso {
+  font-size: 0.875rem;
+  color: var(--texto-suave);
+}
+
+.aviso.es-error {
+  color: var(--error);
+  white-space: pre-line; /* muestra cada error del diccionario en su línea */
+}
+
+/* --- Botones ------------------------------------------------------------- */
+.boton,
+.boton-icono {
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--acento);
+  font: inherit;
+  cursor: pointer;
+}
+
+.boton {
+  padding: 6px 16px;
+  font-weight: 600;
+}
+
+.boton-icono {
+  width: 44px;  /* 44px: tamaño mínimo cómodo para tocar con el dedo */
+  height: 44px;
+  font-size: 1.25rem;
+}
+
+.boton:hover,
+.boton-icono:hover {
+  background: var(--acento-suave);
+}
+
+.boton:focus-visible,
+.boton-icono:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+/* --- Selector de emojis --------------------------------------------------
+   Celular (estilo WhatsApp): una fila de pestañas con iconos que se desliza
+   de lado, y la cuadrícula de emojis debajo.                               */
+/* order cambia el orden visual sin tocar el HTML: en el celular el selector
+   (2) va entre el campo de entrada (1) y el resultado (3), como en WhatsApp. */
+.selector {
+  order: 2;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.selector-pestanas {
+  display: flex;
+  overflow-x: auto;           /* desliza de lado si no caben */
+  scrollbar-width: none;      /* oculta la barra (Firefox) */
+  border-bottom: 1px solid var(--borde);
+}
+
+.selector-pestanas::-webkit-scrollbar {
+  display: none;              /* oculta la barra (Chrome, Edge, Safari) */
+}
+
+.selector-pestana {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 48px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 3px solid transparent; /* línea de la pestaña activa */
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+}
+
+.selector-pestana-icono {
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+/* En el celular solo se ven los iconos; el nombre aparece como título. */
+.selector-pestana-nombre {
+  display: none;
+}
+
+.selector-pestana[aria-selected="true"] {
+  border-bottom-color: var(--acento);
+  background: var(--acento-suave);
+}
+
+.selector-pestana:hover {
+  background: var(--acento-suave);
+}
+
+.selector-contenido {
+  padding: 8px 12px 12px;
+}
+
+/* Cabecera del contenido: título a la izquierda, tonos a la derecha.
+   flex-wrap: en pantallas estrechas los tonos bajan a otra línea. */
+.selector-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 4px 0 8px;
+}
+
+.selector-tonos {
+  display: flex;
+  gap: 2px;
+}
+
+.selector-tono {
+  width: 36px;
+  height: 36px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.selector-tono[aria-pressed="true"] {
+  border-color: var(--acento);
+  background: var(--acento-suave);
+}
+
+.selector-titulo {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+/* auto-fill + minmax: mete tantas columnas de 48px como quepan, y reparte el
+   espacio sobrante. Así la cuadrícula se adapta sola a cualquier ancho. */
+.selector-cuadricula {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.selector-emoji {
+  aspect-ratio: 1;  /* botones cuadrados */
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.selector-emoji:hover,
+.selector-emoji:focus-visible {
+  background: var(--acento-suave);
+  outline: none;
+}
+
+.selector-pestana:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: -2px;
+}
+
+/* --- Pie de página con el crédito de Twemoji ----------------------------- */
+.pie {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--texto-suave);
+}
+
+.pie a {
+  color: inherit;
+}
+
+/* --- Pantallas anchas (tablet horizontal y computadora) ------------------ */
+@media (min-width: 720px) {
+  .paneles {
+    grid-template-columns: 1fr 1fr; /* dos columnas, lado a lado */
+  }
+
+  /* En pantalla ancha vuelve el orden normal: los dos paneles arriba y el
+     selector debajo, ocupando las dos columnas (1 / -1 = de la primera a la
+     última). */
+  .panel-salida,
+  .selector {
+    order: 0;
+  }
+
+  /* Selector estilo GNOME: categorías en una columna a la izquierda. */
+  .selector {
+    grid-column: 1 / -1;
+    grid-template-rows: none;
+    grid-template-columns: 260px 1fr;
+  }
+
+  .selector-pestanas {
+    flex-direction: column;
+    overflow-x: visible;
+    padding: 8px;
+    border-bottom: 0;
+    border-right: 1px solid var(--borde);
+  }
+
+  .selector-pestana {
+    border-bottom: 0;
+    border-radius: 8px;
+    text-align: left;
+  }
+
+  .selector-pestana-nombre {
+    display: inline;
+  }
+
+  .selector-pestana[aria-selected="true"] {
+    background: var(--acento);
+    color: var(--superficie);
+  }
+
+  .selector-cuadricula {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    max-height: 340px;
+  }
+
+  .selector-emoji {
+    font-size: 2rem;
+  }
+
+  .panel {
+    min-height: 280px;
+  }
+
+  .cabecera h1 {
+    font-size: 2.25rem;
+  }
+}
